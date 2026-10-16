@@ -5,7 +5,6 @@ import (
 	"math"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
@@ -26,9 +25,30 @@ const (
 	roleFire, rolePause_ = 2, 3
 )
 
+// touch is one finger on the screen, in game-screen coordinates.
+type touch struct {
+	id   int
+	x, y float64
+}
+
+// touchSource lists the fingers now on the screen. The default asks Ebitengine;
+// the browser build replaces it, because Ebitengine converts the browser's
+// touch positions as if the canvas filled the page, which it does not in the
+// framed layout (touches_wasm.go).
+var touchSource = nativeTouches
+
+func nativeTouches() []touch {
+	var out []touch
+	for _, id := range ebiten.AppendTouchIDs(nil) {
+		x, y := ebiten.TouchPosition(id)
+		out = append(out, touch{int(id), float64(x), float64(y)})
+	}
+	return out
+}
+
 type touchPad struct {
 	enabled bool // draw the pad and react to it
-	roles   map[ebiten.TouchID]int
+	roles   map[int]int
 	dx, dy  int
 	fire    bool
 	firePr  bool // the fire button went down this frame
@@ -36,38 +56,39 @@ type touchPad struct {
 }
 
 // pad is the one virtual pad of the game.
-var pad = &touchPad{roles: map[ebiten.TouchID]int{}}
+var pad = &touchPad{roles: map[int]int{}}
 
 // update reads the touches; call it once per game tick before the scenes.
 func (t *touchPad) update() {
 	t.firePr, t.pausePr = false, false
-	for _, id := range inpututil.AppendJustPressedTouchIDs(nil) {
+	fingers := touchSource()
+	for _, f := range fingers {
+		if _, known := t.roles[f.id]; known {
+			continue
+		}
 		t.enabled = true
-		x, y := ebiten.TouchPosition(id)
-		fx, fy := float64(x), float64(y)
 		switch {
-		case dist(fx, fy, fireX, fireY) <= fireZone:
-			t.roles[id] = roleFire
+		case dist(f.x, f.y, fireX, fireY) <= fireZone:
+			t.roles[f.id] = roleFire
 			t.firePr = true
-		case dist(fx, fy, pauseX, pauseY) <= pauseZone:
-			t.roles[id] = rolePause_
+		case dist(f.x, f.y, pauseX, pauseY) <= pauseZone:
+			t.roles[f.id] = rolePause_
 			t.pausePr = true
-		case dist(fx, fy, padX, padY) <= padZone:
-			t.roles[id] = roleDir
+		case dist(f.x, f.y, padX, padY) <= padZone:
+			t.roles[f.id] = roleDir
 		default:
-			t.roles[id] = roleNone
+			t.roles[f.id] = roleNone
 		}
 	}
-	alive := map[ebiten.TouchID]bool{}
+	alive := map[int]bool{}
 	t.dx, t.dy, t.fire = 0, 0, false
-	for _, id := range ebiten.AppendTouchIDs(nil) {
-		alive[id] = true
-		switch t.roles[id] {
+	for _, f := range fingers {
+		alive[f.id] = true
+		switch t.roles[f.id] {
 		case roleFire:
 			t.fire = true
 		case roleDir:
-			x, y := ebiten.TouchPosition(id)
-			vx, vy := float64(x)-padX, float64(y)-padY
+			vx, vy := f.x-padX, f.y-padY
 			d := math.Hypot(vx, vy)
 			if d < padDead {
 				break

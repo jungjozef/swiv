@@ -69,6 +69,29 @@
     color: #8e9bad;
     font-size: 13px;
   }
+
+  /* Phones (a touch screen with a short side under 600 px): no frame, no title,
+     no legend; the game fills the whole viewport, the engine keeps the shape
+     (black bars where the screen is not 5:4). Tablets keep the framed layout. */
+  html, body { overscroll-behavior: none; }
+  @media (pointer: coarse) and (max-width: 599px), (pointer: coarse) and (max-height: 599px) {
+    html {
+      display: block !important;
+      min-height: 0;
+      padding: 0;
+      background: #000 !important;
+    }
+    html::before, html::after { display: none; }
+    body {
+      position: fixed !important;
+      inset: 0 !important;
+      width: auto !important;
+      height: auto !important;
+      border: 0;
+      border-radius: 0;
+      box-shadow: none;
+    }
+  }
 </style>
 </head>
 <body>

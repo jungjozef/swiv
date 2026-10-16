@@ -1,12 +1,12 @@
 # Builds the browser version (GOOS=js GOARCH=wasm) and publishes web/ on
 # GitHub Pages, together with the SWIV.adf committed in the repository root.
-# Runs on every push to master and by hand (Actions -> Deploy to GitHub Pages ->
+# Runs on every push to main (or master) and by hand (Actions -> Deploy to GitHub Pages ->
 # Run workflow). Enable it once under Settings -> Pages -> Source: GitHub Actions.
 name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [master]
+    branches: [main, master]
   workflow_dispatch:
 
 permissions:

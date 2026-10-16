@@ -110,3 +110,9 @@ at the bottom right and two bars at the top right for pause. It shows from the
 first touch on, and from the start in a browser that reports a touch screen, and
 works next to the keyboard. The fire button also starts the game on the title
 screen, leaves the end screens and accepts the high-score name as it is.
+
+The browser build reads the touches itself (`touches_wasm.go`): Ebitengine
+converts a touch as if the canvas covered the page, which puts the fingers in
+the wrong place in the framed layout. On phones (`pointer: coarse` and a short
+side under 600 px) the page drops the frame, title and legend and the game fills
+the viewport, keeping its 5:4 shape; tablets keep the framed layout.
