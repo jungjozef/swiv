@@ -16,6 +16,13 @@
     --gold: #e8b030;
     --ink: #cfd6df;
   }
+  html, body, canvas {
+    touch-action: none;                 /* the virtual pad owns the touches */
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+  }
   html {
     height: auto !important;
     min-height: 100%;
@@ -55,7 +62,7 @@
     overflow: hidden;
   }
   html::after {
-    content: "Arrow keys: fly   ·   Space / Z / Ctrl: fire   ·   P: pause   ·   H on the title screen: controls\A Click the game and press Space to start; the sound begins with the first key press.";
+    content: "Arrow keys: fly   ·   Space / Z / Ctrl: fire   ·   P: pause   ·   H on the title screen: controls\A Touch screens: the pad at the bottom left flies, the round button fires, the bars pause. Click or touch the game and fire to start; the sound begins with the first input.";
     white-space: pre-line;
     text-align: center;
     max-width: 92vw;

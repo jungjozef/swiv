@@ -57,6 +57,14 @@ func readInput() (dx, dy int, fire bool) {
 		dx, dy = axis(ebiten.KeyArrowLeft, ebiten.KeyArrowRight), axis(ebiten.KeyArrowUp, ebiten.KeyArrowDown)
 		fire = ebiten.IsKeyPressed(ebiten.KeySpace) || ebiten.IsKeyPressed(ebiten.KeyZ) || ebiten.IsKeyPressed(ebiten.KeyControlLeft)
 	}
+	// the virtual pad works next to every scheme
+	if pad.dx != 0 {
+		dx = pad.dx
+	}
+	if pad.dy != 0 {
+		dy = pad.dy
+	}
+	fire = fire || pad.fire
 	return
 }
 
@@ -74,6 +82,9 @@ func axis(neg, pos ebiten.Key) int {
 // firePressed is true on the frame a fire button goes down (any scheme, any
 // device: in the original the title reacts to every joystick and key).
 func firePressed() bool {
+	if pad.firePr {
+		return true
+	}
 	for _, k := range []ebiten.Key{ebiten.KeySpace, ebiten.KeyEnter, ebiten.KeyZ, ebiten.KeyControlLeft, ebiten.KeyShiftLeft, ebiten.KeyJ} {
 		if inpututil.IsKeyJustPressed(k) {
 			return true

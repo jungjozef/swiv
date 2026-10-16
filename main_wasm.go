@@ -85,7 +85,18 @@ func fetchDisk() (*adf.Disk, error) {
 	return adf.Parse(b)
 }
 
+// touchDevice reports whether the browser has a touch screen: the virtual pad
+// is then drawn from the start.
+func touchDevice() bool {
+	if js.Global().Get("ontouchstart").Truthy() {
+		return true
+	}
+	nav := js.Global().Get("navigator")
+	return nav.Truthy() && nav.Get("maxTouchPoints").Truthy() && nav.Get("maxTouchPoints").Int() > 0
+}
+
 func main() {
+	pad.enabled = touchDevice()
 	l := &boot{}
 	go func() {
 		disk, err := fetchDisk()

@@ -175,7 +175,7 @@ func (s *LevelScene) Update() error {
 		s.updateEnd()
 		return nil
 	}
-	if inpututil.IsKeyJustPressed(ebiten.KeyP) {
+	if inpututil.IsKeyJustPressed(ebiten.KeyP) || pad.pausePr {
 		s.paused = !s.paused
 	}
 	if debugKeys {
@@ -370,7 +370,7 @@ func (s *LevelScene) updateEnd() {
 	e := s.end
 	e.wait++
 	pressed := inpututil.IsKeyJustPressed(ebiten.KeyEnter) || inpututil.IsKeyJustPressed(ebiten.KeySpace) ||
-		inpututil.IsKeyJustPressed(ebiten.KeyZ) || inpututil.IsKeyJustPressed(ebiten.KeyControlLeft)
+		inpututil.IsKeyJustPressed(ebiten.KeyZ) || inpututil.IsKeyJustPressed(ebiten.KeyControlLeft) || pad.firePr
 	next := func() {
 		e.wait = 0
 		switch e.phase {
@@ -409,7 +409,8 @@ func (s *LevelScene) updateEnd() {
 		if inpututil.IsKeyJustPressed(ebiten.KeyBackspace) && e.name != "" {
 			e.name = e.name[:len(e.name)-1]
 		}
-		if inpututil.IsKeyJustPressed(ebiten.KeyEnter) || e.wait > 40*50 {
+		// without a keyboard the fire button accepts the name as it is
+		if inpututil.IsKeyJustPressed(ebiten.KeyEnter) || pad.firePr || e.wait > 40*50 {
 			next()
 		}
 	default:

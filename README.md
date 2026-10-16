@@ -101,3 +101,12 @@ with the `SWIV.adf` from the repository root (commit it there) on every push to
 workflow"). Enable it once under Settings, Pages, Source: GitHub Actions. The
 workflow clones `jungjozef/protracker-go` next to the repository because
 `go.mod` replaces `protracker-go` and `protracker-player` with `../protracker-go`.
+
+### Touch screens
+
+The game draws a virtual pad over the picture (`touchpad.go`): a direction pad
+at the bottom left (eight directions, the finger can slide), a round fire button
+at the bottom right and two bars at the top right for pause. It shows from the
+first touch on, and from the start in a browser that reports a touch screen, and
+works next to the keyboard. The fire button also starts the game on the title
+screen, leaves the end screens and accepts the high-score name as it is.
