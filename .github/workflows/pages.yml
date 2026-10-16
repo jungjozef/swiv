@@ -1,0 +1,55 @@
+# Builds the browser version (GOOS=js GOARCH=wasm) and publishes web/ on
+# GitHub Pages, together with the SWIV.adf committed in the repository root.
+# Runs on every push to master and by hand (Actions -> Deploy to GitHub Pages ->
+# Run workflow). Enable it once under Settings -> Pages -> Source: GitHub Actions.
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # go.mod replaces protracker-go and protracker-player with ../protracker-go
+      - name: Fetch protracker-go next to the repository
+        run: git clone --depth 1 https://github.com/jungjozef/protracker-go ../protracker-go
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache-dependency-path: go.sum
+
+      - name: Check the disk image
+        run: test -f SWIV.adf || (echo "SWIV.adf must be committed in the repository root" && exit 1)
+
+      - name: Build the wasm version
+        run: tools/build_wasm.sh
+
+      - name: Bundle the disk image
+        run: cp SWIV.adf web/SWIV.adf
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: web
+
+      - id: deployment
+        uses: actions/deploy-pages@v4

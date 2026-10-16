@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SWIV</title>
+<meta name="description" content="SWIV (Sales Curve, 1991), recreated in Go from the Amiga program and played in the browser.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23101820'/%3E%3Cpath d='M16 4l3 9 9 3-9 3-3 9-3-9-9-3 9-3z' fill='%23e8b030'/%3E%3C/svg%3E">
+<style>
+  /* The game (Ebitengine) appends its canvas to <body> and fills the body, so
+     the body is the screen: a fixed 5:4 box. The !important rules win over the
+     inline styles the engine sets. The title and the key legend are
+     pseudo-elements of <html> so that they stay outside the screen. */
+  :root {
+    --screen-w: min(640px, 92vw, calc((100vh - 250px) * 1.25));
+    --gold: #e8b030;
+    --ink: #cfd6df;
+  }
+  html {
+    height: auto !important;
+    min-height: 100%;
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    padding: 16px 0 24px;
+    box-sizing: border-box;
+    background:
+      radial-gradient(ellipse at 50% 0%, #26364c 0%, #121a26 55%, #080c12 100%) fixed !important;
+    color: var(--ink);
+    font: 14px/1.5 "Trebuchet MS", system-ui, sans-serif;
+  }
+  html::before {
+    content: "SWIV";
+    font: 800 44px/1 "Impact", "Arial Black", sans-serif;
+    letter-spacing: 0.35em;
+    padding-left: 0.35em;
+    color: var(--gold);
+    text-shadow: 0 2px 0 #7a5410, 0 0 24px rgba(232, 176, 48, .35);
+  }
+  body {
+    width: var(--screen-w) !important;
+    height: calc(var(--screen-w) * 0.8) !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #000 !important;
+    border: 3px solid #05080c;
+    border-radius: 10px;
+    box-shadow:
+      0 0 0 2px #3a4b63,
+      0 0 0 10px #1b2636,
+      0 0 0 12px #3a4b63,
+      0 24px 60px rgba(0, 0, 0, .65);
+    overflow: hidden;
+  }
+  html::after {
+    content: "Arrow keys: fly   ·   Space / Z / Ctrl: fire   ·   P: pause   ·   H on the title screen: controls\A Click the game and press Space to start; the sound begins with the first key press.";
+    white-space: pre-line;
+    text-align: center;
+    max-width: 92vw;
+    color: #8e9bad;
+    font-size: 13px;
+  }
+</style>
+</head>
+<body>
+<script src="wasm_exec.js"></script>
+<script>
+  // swiv.wasm fetches SWIV.adf from this directory.
+  const go = new Go();
+  WebAssembly.instantiateStreaming(fetch("swiv.wasm"), go.importObject)
+    .then((r) => go.run(r.instance))
+    .catch((e) => { document.body.style.color = "#fff"; document.body.textContent = "Could not start: " + e; });
+</script>
+</body>
+</html>

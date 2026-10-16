@@ -1,0 +1,3 @@
+#!/bin/sh
+# dr START END : disassemble AMPROG.OBJ range (hex)
+exec "$(dirname "$0")/../.venv/bin/python" "$(dirname "$0")/disrange.py" "$@"

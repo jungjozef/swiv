@@ -1,0 +1,6 @@
+.venv/
+assets/
+reverse/
+web/swiv.wasm
+web/wasm_exec.js
+web/SWIV.adf
